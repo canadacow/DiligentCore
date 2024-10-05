@@ -397,7 +397,6 @@ if(MSVC)
     endif()
 
     # Enable whole program optimization
-    set(DEFAULT_DILIGENT_MSVC_RELEASE_COMPILE_OPTIONS /GL)
     if("${TARGET_CPU}" STREQUAL "x86_64")
         # Enable AVX2
         set(DEFAULT_DILIGENT_MSVC_RELEASE_COMPILE_OPTIONS ${DEFAULT_DILIGENT_MSVC_RELEASE_COMPILE_OPTIONS} /arch:AVX2)
