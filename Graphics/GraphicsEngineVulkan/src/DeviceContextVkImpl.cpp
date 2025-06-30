@@ -2073,11 +2073,13 @@ void DeviceContextVkImpl::CopyBuffer(IBuffer*                       pSrcBuffer,
     ++m_State.NumCommands;
 }
 
-void DeviceContextVkImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, PVoid& pMappedData)
+void DeviceContextVkImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size, PVoid& pMappedData)
 {
-    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, pMappedData);
+    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, Offset, Size, pMappedData);
     auto* const pBufferVk = ClassPtrCast<BufferVkImpl>(pBuffer);
     const auto& BuffDesc  = pBufferVk->GetDesc();
+
+    DEV_CHECK_ERR(Offset + Size <= BuffDesc.Size, "Map region is out of buffer bounds which will result in an undefined behavior");
 
     if (MapType == MAP_READ)
     {
@@ -2107,7 +2109,7 @@ void DeviceContextVkImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAG
             auto& DynAllocation = pBufferVk->m_DynamicData[GetContextId()];
             if ((MapFlags & MAP_FLAG_DISCARD) != 0 || !DynAllocation)
             {
-                DynAllocation = AllocateDynamicSpace(BuffDesc.Size, pBufferVk->m_DynamicOffsetAlignment);
+                DynAllocation = AllocateDynamicSpace(Size, pBufferVk->m_DynamicOffsetAlignment);
             }
             else
             {

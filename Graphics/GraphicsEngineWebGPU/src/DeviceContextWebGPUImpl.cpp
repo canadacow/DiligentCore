@@ -703,9 +703,11 @@ void DeviceContextWebGPUImpl::CopyBuffer(IBuffer*                       pSrcBuff
 void DeviceContextWebGPUImpl::MapBuffer(IBuffer*  pBuffer,
                                         MAP_TYPE  MapType,
                                         MAP_FLAGS MapFlags,
+                                        Uint64    Offset,
+                                        Uint64    Size,
                                         PVoid&    pMappedData)
 {
-    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, pMappedData);
+    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, Offset, Size, pMappedData);
 
     BufferWebGPUImpl* const pBufferWebGPU = ClassPtrCast<BufferWebGPUImpl>(pBuffer);
     const BufferDesc&       BuffDesc      = pBufferWebGPU->GetDesc();

@@ -751,10 +751,23 @@ void DXCompilerImpl::Compile(const ShaderCreateInfo& ShaderCI,
                 L"-fspv-reflect",
 #ifdef DILIGENT_DEBUG
                 DXC_ARG_SKIP_OPTIMIZATIONS,
+                DXC_ARG_DEBUG,
+                //L"-fspv-debug=vulkan-with-source",
 #else
                 DXC_ARG_OPTIMIZATION_LEVEL3
 #endif
             });
+
+        if (ShaderCI.CompileFlags & SHADER_COMPILE_FULL_DEBUG)
+        {
+#ifdef DILIGENT_DEBUG            
+            DxilArgs.push_back(L"-fspv-debug=vulkan-with-source");
+#else
+            // In release mode, we need to assert if full debug is requested
+            // since we can't enable debug features without debug mode
+            UNEXPECTED("SHADER_COMPILE_FULL_DEBUG flag requires debug configuration");
+#endif
+        }
 
         if (m_APIVersion >= VK_API_VERSION_1_2 && ShaderModel >= ShaderVersion{6, 3})
         {

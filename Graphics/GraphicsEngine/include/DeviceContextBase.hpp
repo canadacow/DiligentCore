@@ -239,6 +239,8 @@ public:
     virtual void DILIGENT_CALL_TYPE MapBuffer(IBuffer*  pBuffer,
                                               MAP_TYPE  MapType,
                                               MAP_FLAGS MapFlags,
+                                              Uint64    Offset,
+                                              Uint64    Size,
                                               PVoid&    pMappedData) override = 0;
 
     /// Base implementation of IDeviceContext::UnmapBuffer()
@@ -1724,6 +1726,8 @@ inline void DeviceContextBase<ImplementationTraits>::MapBuffer(
     IBuffer*  pBuffer,
     MAP_TYPE  MapType,
     MAP_FLAGS MapFlags,
+    Uint64    Offset,
+    Uint64    Size,
     PVoid&    pMappedData)
 {
     DEV_CHECK_ERR(pBuffer, "pBuffer must not be null");

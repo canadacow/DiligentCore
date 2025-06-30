@@ -179,6 +179,8 @@ public:
     void DILIGENT_CALL_TYPE MapBuffer(IBuffer*  pBuffer,
                                       MAP_TYPE  MapType,
                                       MAP_FLAGS MapFlags,
+                                      Uint64    Offset,
+                                      Uint64    Size,
                                       PVoid&    pMappedData) override final;
 
     /// Implementation of IDeviceContext::UnmapBuffer() in WebGPU backend.

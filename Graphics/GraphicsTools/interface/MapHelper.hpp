@@ -61,7 +61,9 @@ public:
         m_pContext    {nullptr},
         m_pMappedData {nullptr},
         m_MapType     {static_cast<MAP_TYPE>(-1)},
-        m_MapFlags    {static_cast<Uint32>(-1)  }
+        m_MapFlags    {static_cast<Uint32>(-1)},
+        m_Offset      {0},
+        m_Size        {0}
     // clang-format on
     {
     }
@@ -74,6 +76,14 @@ public:
         Map(pContext, pBuffer, MapType, MapFlags);
     }
 
+    /// Initializes the object and maps the provided resource.
+    /// See Map() for details.
+    MapHelper(IDeviceContext* pContext, IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size) :
+        MapHelper()
+    {
+        Map(pContext, pBuffer, MapType, MapFlags, Offset, Size);
+    }
+
     /// Move constructor: takes over resource ownership from Helper
     // clang-format off
     MapHelper(MapHelper&& Helper) :
@@ -81,7 +91,9 @@ public:
         m_pMappedData   {std::move(Helper.m_pMappedData)},
         m_pContext      {std::move(Helper.m_pContext)   },
         m_MapType       {std::move(Helper.m_MapType)    },
-        m_MapFlags      {std::move(Helper.m_MapFlags)   }
+        m_MapFlags      {std::move(Helper.m_MapFlags)   },
+        m_Offset        {std::move(Helper.m_Offset)     },
+        m_Size          {std::move(Helper.m_Size)       }
     // clang-format on
     {
         Helper.m_pBuffer     = nullptr;
@@ -89,6 +101,8 @@ public:
         Helper.m_pMappedData = nullptr;
         Helper.m_MapType     = static_cast<MAP_TYPE>(-1);
         Helper.m_MapFlags    = static_cast<Uint32>(-1);
+        Helper.m_Offset      = 0;
+        Helper.m_Size        = 0;
     }
 
     /// Move-assignment operator: takes over resource ownership from Helper
@@ -99,23 +113,38 @@ public:
         m_pContext    = std::move(Helper.m_pContext);
         m_MapType     = std::move(Helper.m_MapType);
         m_MapFlags    = std::move(Helper.m_MapFlags);
+        m_Offset      = std::move(Helper.m_Offset);
+        m_Size        = std::move(Helper.m_Size);
 
         Helper.m_pBuffer     = nullptr;
         Helper.m_pContext    = nullptr;
         Helper.m_pMappedData = nullptr;
         Helper.m_MapType     = static_cast<MAP_TYPE>(-1);
         Helper.m_MapFlags    = static_cast<Uint32>(-1);
+        Helper.m_Offset      = 0;
+        Helper.m_Size        = 0;
 
         return *this;
     }
 
     /// Maps the provided resource.
-
     /// \param pContext - Pointer to the device context to perform mapping with.
     /// \param pBuffer - Pointer to the buffer interface to map.
     /// \param MapType - Type of the map operation, see Diligent::MAP_TYPE for details.
     /// \param MapFlags - Additional map flags, see Diligent::MAP_FLAGS.
     void Map(IDeviceContext* pContext, IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags)
+    {
+        Map(pContext, pBuffer, MapType, MapFlags, 0, pBuffer->GetDesc().Size);
+    }
+
+    /// Maps the provided resource by specifying the offset and size of the mapped region.
+    /// \param pContext - Pointer to the device context to perform mapping with.
+    /// \param pBuffer - Pointer to the buffer interface to map.
+    /// \param MapType - Type of the map operation, see Diligent::MAP_TYPE for details.
+    /// \param MapFlags - Additional map flags, see Diligent::MAP_FLAGS.
+    /// \param Offset - Offset in bytes from the beginning of the buffer to the beginning of the mapped region.
+    /// \param Size - Size in bytes of the mapped region.
+    void Map(IDeviceContext* pContext, IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size)
     {
         VERIFY(!m_pBuffer && !m_pMappedData && !m_pContext, "Object already mapped");
         Unmap();
@@ -125,13 +154,15 @@ public:
             VERIFY(sizeof(DataType) <= BuffDesc.Size, "Data type size exceeds buffer size");
         }
 #endif
-        pContext->MapBuffer(pBuffer, MapType, MapFlags, (PVoid&)m_pMappedData);
+        pContext->MapBuffer(pBuffer, MapType, MapFlags, Offset, Size, (PVoid&)m_pMappedData);
         if (m_pMappedData != nullptr)
         {
             m_pContext = pContext;
             m_pBuffer  = pBuffer;
             m_MapType  = MapType;
             m_MapFlags = MapFlags;
+            m_Offset   = Offset;
+            m_Size     = Size;
         }
     }
 
@@ -144,6 +175,8 @@ public:
             m_pBuffer  = nullptr;
             m_MapType  = static_cast<MAP_TYPE>(-1);
             m_MapFlags = static_cast<Uint32>(-1);
+            m_Offset   = 0;
+            m_Size     = 0;
         }
         m_pContext    = nullptr;
         m_pMappedData = nullptr;
@@ -199,6 +232,10 @@ private:
     MAP_TYPE m_MapType;
 
     Uint32 m_MapFlags;
+
+    Uint64 m_Offset;
+
+    Uint64 m_Size;
 };
 
 } // namespace Diligent

@@ -1012,9 +1012,9 @@ void DeviceContextD3D11Impl::CopyBuffer(IBuffer*                       pSrcBuffe
 }
 
 
-void DeviceContextD3D11Impl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, PVoid& pMappedData)
+void DeviceContextD3D11Impl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size, PVoid& pMappedData)
 {
-    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, pMappedData);
+    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, Offset, Size, pMappedData);
 
     auto*     pBufferD3D11  = ClassPtrCast<BufferD3D11Impl>(pBuffer);
     D3D11_MAP d3d11MapType  = static_cast<D3D11_MAP>(0);

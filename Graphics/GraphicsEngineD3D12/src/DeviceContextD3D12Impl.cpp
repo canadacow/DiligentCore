@@ -1701,7 +1701,7 @@ void DeviceContextD3D12Impl::CopyBuffer(IBuffer*                       pSrcBuffe
     ++m_State.NumCommands;
 }
 
-void DeviceContextD3D12Impl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, PVoid& pMappedData)
+void DeviceContextD3D12Impl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size, PVoid& pMappedData)
 {
     TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, pMappedData);
     auto*       pBufferD3D12   = ClassPtrCast<BufferD3D12Impl>(pBuffer);

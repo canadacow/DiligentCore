@@ -170,7 +170,7 @@ public:
                                                RESOURCE_STATE_TRANSITION_MODE DstBufferTransitionMode) override final;
 
     /// Implementation of IDeviceContext::MapBuffer() in Direct3D11 backend.
-    virtual void DILIGENT_CALL_TYPE MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, PVoid& pMappedData) override final;
+    virtual void DILIGENT_CALL_TYPE MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size, PVoid& pMappedData) override final;
 
     /// Implementation of IDeviceContext::UnmapBuffer() in Direct3D11 backend.
     virtual void DILIGENT_CALL_TYPE UnmapBuffer(IBuffer* pBuffer, MAP_TYPE MapType) override final;

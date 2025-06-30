@@ -3150,6 +3150,8 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
     /// \param [in] pBuffer      - Pointer to the buffer to map.
     /// \param [in] MapType      - Type of the map operation. See Diligent::MAP_TYPE.
     /// \param [in] MapFlags     - Special map flags. See Diligent::MAP_FLAGS.
+    /// \param [in] Offset       - Offset in bytes from the beginning of the buffer to the beginning of the mapped region.
+    /// \param [in] Size         - Size in bytes of the mapped region.
     /// \param [out] pMappedData - Reference to the void pointer to store the address of the mapped region.
     ///
     /// \remarks Supported contexts: graphics, compute, transfer.
@@ -3157,6 +3159,8 @@ DILIGENT_BEGIN_INTERFACE(IDeviceContext, IObject)
                                    IBuffer*     pBuffer,
                                    MAP_TYPE     MapType,
                                    MAP_FLAGS    MapFlags,
+                                   Uint64       Offset,
+                                   Uint64       Size,
                                    PVoid REF    pMappedData) PURE;
 
 

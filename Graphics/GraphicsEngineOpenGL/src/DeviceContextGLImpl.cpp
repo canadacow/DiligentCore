@@ -1692,9 +1692,9 @@ void DeviceContextGLImpl::CopyBuffer(IBuffer*                       pSrcBuffer,
     pDstBufferGL->CopyData(m_ContextState, *pSrcBufferGL, SrcOffset, DstOffset, Size);
 }
 
-void DeviceContextGLImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, PVoid& pMappedData)
+void DeviceContextGLImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAGS MapFlags, Uint64 Offset, Uint64 Size, PVoid& pMappedData)
 {
-    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, pMappedData);
+    TDeviceContextBase::MapBuffer(pBuffer, MapType, MapFlags, Offset, Size, pMappedData);
     auto* pBufferGL = ClassPtrCast<BufferGLImpl>(pBuffer);
     pBufferGL->Map(m_ContextState, MapType, MapFlags, pMappedData);
 }
