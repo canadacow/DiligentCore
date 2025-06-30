@@ -2081,6 +2081,11 @@ void DeviceContextVkImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAG
 
     DEV_CHECK_ERR(Offset + Size <= BuffDesc.Size, "Map region is out of buffer bounds which will result in an undefined behavior");
 
+    if (Offset == 0 && Size == 0)
+    {
+        Size = BuffDesc.Size;
+    }
+
     if (MapType == MAP_READ)
     {
         DEV_CHECK_ERR(BuffDesc.Usage == USAGE_STAGING || BuffDesc.Usage == USAGE_UNIFIED,
@@ -2110,6 +2115,11 @@ void DeviceContextVkImpl::MapBuffer(IBuffer* pBuffer, MAP_TYPE MapType, MAP_FLAG
             if ((MapFlags & MAP_FLAG_DISCARD) != 0 || !DynAllocation)
             {
                 DynAllocation = AllocateDynamicSpace(Size, pBufferVk->m_DynamicOffsetAlignment);
+                // Store the mapped size for use during UnmapBuffer
+                if (MapFlags & MAP_FLAG_DISCARD)
+                {
+                    DynAllocation.MappedSize = Size;
+                }
             }
             else
             {
@@ -2183,7 +2193,11 @@ void DeviceContextVkImpl::UnmapBuffer(IBuffer* pBuffer, MAP_TYPE MapType)
             {
                 auto& DynAlloc  = pBufferVk->m_DynamicData[GetContextId()];
                 auto  vkSrcBuff = DynAlloc.pDynamicMemMgr->GetVkBuffer();
-                UpdateBufferRegion(pBufferVk, 0, BuffDesc.Size, vkSrcBuff, DynAlloc.AlignedOffset, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+                // Use the stored mapped size if available (for MAP_FLAG_DISCARD), otherwise use full buffer size
+                Uint64 CopySize = (DynAlloc.MappedSize > 0) ? DynAlloc.MappedSize : BuffDesc.Size;
+                UpdateBufferRegion(pBufferVk, 0, CopySize, vkSrcBuff, DynAlloc.AlignedOffset, RESOURCE_STATE_TRANSITION_MODE_TRANSITION);
+                // Reset the mapped size after use
+                DynAlloc.MappedSize = 0;
             }
         }
     }

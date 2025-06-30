@@ -149,7 +149,9 @@ private:
             return *this;
         }
 
-        Uint8 Padding[CacheLineSize - sizeof(VulkanDynamicAllocation)] = {};
+        // Store the mapped size for MAP_FLAG_DISCARD operations
+        Uint64 MappedSize = 0;
+        Uint8 Padding[CacheLineSize - sizeof(VulkanDynamicAllocation) - sizeof(Uint64)] = {};
     };
     static_assert(sizeof(CtxDynamicData) == CacheLineSize, "Unexpected sizeof(CtxDynamicData)");
     std::vector<CtxDynamicData, STDAllocatorRawMem<CtxDynamicData>> m_DynamicData;
